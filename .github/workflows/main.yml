@@ -1,0 +1,41 @@
+name: Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  - push
+  - workflow_dispatch
+
+env:
+  EARTHLY_USE_INLINE_CACHE: true
+  EARTHLY_SAVE_INLINE_CACHE: true
+  EARTHLY_VERBOSE: true
+  EARTHLY_FULL_TARGET: true
+  EARTHLY_OUTPUT: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        runs:
+          - workdir: rust/targets
+            target: prepare-tier1
+          - workdir: rust/targets
+            target: prepare-powerpc-unknown-linux-gnuspe
+          - workdir: rust/targets
+            target: ds-qoriq-sdk
+    steps:
+      - uses: earthly/actions-setup@v1
+        with:
+          version: "latest"
+      - uses: actions/checkout@v3
+      - name: Build and possibly push
+        run: |
+          cd "${{ matrix.runs.workdir }}"
+          earthly "${{ matrix.runs.target }}"
