@@ -1,0 +1,22 @@
+
+# IntelliJ files
+.idea
+.idea_modules
+*.iml
+*.iws
+out
+gen
+
+# OS crap
+*~
+._*
+.Apple*
+.DS_Store
+.fuse_hidden
+Network Trash Folder
+.nfs*
+.TemporaryItems
+Temporary Items
+.Trash-*
+.Trashes
+.VolumeIcon.icns
