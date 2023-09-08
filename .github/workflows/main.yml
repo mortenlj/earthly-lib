@@ -25,11 +25,11 @@ jobs:
       matrix:
         runs:
           - workdir: rust/targets
-            target: prepare-tier1
+            target: +prepare-tier1
           - workdir: rust/targets
-            target: prepare-powerpc-unknown-linux-gnuspe
+            target: +prepare-powerpc-unknown-linux-gnuspe
           - workdir: rust/targets
-            target: ds-qoriq-sdk
+            target: +ds-qoriq-sdk
     steps:
       - uses: earthly/actions-setup@v1
         with:
