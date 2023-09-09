@@ -1,0 +1,18 @@
+VERSION 0.7
+
+ASSEMBLE_MANIFESTS:
+    COMMAND
+    FROM dinutac/jinja2docker:latest
+    WORKDIR /manifests
+
+    COPY deploy/* /templates
+    ARG IMAGE=ghcr.io/$EARTHLY_GIT_PROJECT_NAME
+    ARG VERSION=$EARTHLY_GIT_SHORT_HASH
+
+    FOR template IN $(ls /templates/*.j2)
+        RUN jinja2 ${template} >> ./deploy.yaml
+    END
+
+    RUN cat /templates/*.yaml >> ./deploy.yaml
+
+    SAVE ARTIFACT ./deploy.yaml AS LOCAL deploy.yaml
