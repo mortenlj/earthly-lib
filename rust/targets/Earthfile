@@ -13,7 +13,7 @@ ds-qoriq-sdk:
     SAVE ARTIFACT /tmp/ds-qoriq-sdk/usr/local/powerpc-e500v2-linux-gnuspe
 
 common-build-setup:
-    RUN apt-get --yes update && apt-get --yes install cmake musl-tools gcc-aarch64-linux-gnu
+    RUN apt-get --yes update && apt-get --yes install cmake musl-tools gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
     RUN rustup target add x86_64-unknown-linux-musl
     RUN rustup toolchain add nightly
     RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
@@ -40,3 +40,6 @@ prepare-tier1:
 
     ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc
     ENV CC_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-gcc
+
+    ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-gcc
+    ENV CC_armv7_unknown_linux_gnueabihf=/usr/bin/arm-linux-gnueabihf-gcc
