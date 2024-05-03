@@ -13,6 +13,8 @@ ASSEMBLE_MANIFESTS:
         RUN jinja2 ${template} >> ./deploy.yaml
     END
 
-    RUN cat /templates/*.yaml >> ./deploy.yaml
+    FOR template IN $(ls /templates/*.yaml)
+        RUN cat ${template} >> ./deploy.yaml
+    END
 
     SAVE ARTIFACT ./deploy.yaml AS LOCAL deploy.yaml
