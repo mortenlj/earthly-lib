@@ -27,9 +27,7 @@ jobs:
           - workdir: rust/targets
             target: +prepare-tier1
           - workdir: rust/targets
-            target: +prepare-powerpc-unknown-linux-gnuspe
-          - workdir: rust/targets
-            target: +ds-qoriq-sdk
+            target: +test
     steps:
       - uses: earthly/actions-setup@v1
         with:

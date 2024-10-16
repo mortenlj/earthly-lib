@@ -1,12 +1,30 @@
 VERSION 0.8
 
+IMPORT ../commands AS lib-commands
+
 FROM rust:1-bullseye
+
+ARG NATIVEPLATFORM
+IF [[ "${NATIVEPLATFORM}" == "linux/arm64" ]]
+    RUN echo "Running on arm64"
+    ARG --global NATIVETARGET=aarch64-unknown-linux-musl
+ELSE
+    RUN echo "Running on x86_64 we assume"
+    ARG --global NATIVETARGET=x86_64-unknown-linux-musl
+END
+RUN echo "Set NATIVETARGET to ${NATIVETARGET}"
 
 WORKDIR /code
 
 common-build-setup:
-    RUN apt-get --yes update && apt-get --yes install cmake musl-tools gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
-    RUN rustup target add x86_64-unknown-linux-musl
+    RUN apt-get --yes update && apt-get --yes install cmake musl-tools gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-x86-64-linux-gnu
+    FOR clib IN gnu musl
+        RUN rustup target add armv7-unknown-linux-${clib}eabihf
+        FOR arch IN aarch64 x86_64
+            RUN rustup target add ${arch}-unknown-linux-${clib}
+        END
+    END
+    RUN rustup component add clippy
 
     RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     RUN cargo binstall --no-confirm --no-cleanup cargo-chef cargo-nextest
@@ -16,6 +34,25 @@ prepare-tier1:
 
     ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc
     ENV CC_aarch64_unknown_linux_gnu=/usr/bin/aarch64-linux-gnu-gcc
+    ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=/usr/bin/aarch64-linux-gnu-gcc
+    ENV CC_aarch64_unknown_linux_musl=/usr/bin/aarch64-linux-gnu-gcc
 
     ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-gcc
     ENV CC_armv7_unknown_linux_gnueabihf=/usr/bin/arm-linux-gnueabihf-gcc
+    ENV CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABIHF_LINKER=/usr/bin/arm-linux-gnueabihf-gcc
+    ENV CC_armv7_unknown_linux_musleabihf=/usr/bin/arm-linux-gnueabihf-gcc
+
+
+test:
+    FROM +prepare-tier1
+
+    RUN cargo init --name hello --bin --vcs none && cargo update
+    FOR clib IN gnu musl
+        FOR arch IN aarch64 x86_64
+            RUN echo "Building for ${arch}-unknown-linux-${clib}"
+            RUN cargo build --release --target ${arch}-unknown-linux-${clib}
+        END
+        RUN echo "Building for armv7-unknown-linux-${clib}eabihf"
+        RUN cargo build --release --target armv7-unknown-linux-${clib}eabihf
+    END
+    RUN target/${NATIVETARGET}/release/hello
