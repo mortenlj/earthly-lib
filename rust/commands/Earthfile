@@ -13,7 +13,7 @@ BUILD:
     FUNCTION
     ARG target
 
-    RUN cargo chef cook --recipe-path recipe.json --target ${target} --release
+    RUN if [ -e recipe.json ]; then cargo chef cook --recipe-path recipe.json --target ${target} --release; fi
 
     COPY --dir src Cargo.lock Cargo.toml .
     RUN cargo build --target ${target} --release
