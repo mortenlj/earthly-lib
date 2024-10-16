@@ -5,12 +5,12 @@ FROM rust:1-bullseye
 WORKDIR /code
 
 CHEF_PREPARE:
-    COMMAND
+    FUNCTION
     COPY --dir src Cargo.lock Cargo.toml .
     RUN cargo chef prepare --recipe-path recipe.json
 
 BUILD:
-    COMMAND
+    FUNCTION
     ARG target
 
     RUN cargo chef cook --recipe-path recipe.json --target ${target} --release
