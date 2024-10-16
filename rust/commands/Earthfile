@@ -1,4 +1,4 @@
-VERSION 0.7
+VERSION 0.8
 
 FROM rust:1-bullseye
 
@@ -13,7 +13,7 @@ BUILD:
     COMMAND
     ARG target
 
-    RUN cargo +nightly chef cook --recipe-path recipe.json -Z build-std --target ${target} --release
+    RUN cargo chef cook --recipe-path recipe.json --target ${target} --release
 
     COPY --dir src Cargo.lock Cargo.toml .
-    RUN cargo +nightly build -Z build-std --target ${target} --release
+    RUN cargo build --target ${target} --release

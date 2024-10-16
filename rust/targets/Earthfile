@@ -1,7 +1,5 @@
 VERSION 0.8
 
-IMPORT ../commands AS lib-commands
-
 FROM rust:1-bullseye
 
 WORKDIR /code
@@ -9,8 +7,6 @@ WORKDIR /code
 common-build-setup:
     RUN apt-get --yes update && apt-get --yes install cmake musl-tools gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
     RUN rustup target add x86_64-unknown-linux-musl
-    RUN rustup toolchain add nightly
-    RUN rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 
     RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     RUN cargo binstall --no-confirm --no-cleanup cargo-chef cargo-nextest
