@@ -1,6 +1,6 @@
 VERSION 0.8
 
-FROM rust:1-bullseye
+FROM rust:1
 
 WORKDIR /code
 
